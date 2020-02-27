@@ -3,3 +3,14 @@ version: @version@
 main: @group@.@pluginname@.@pluginName@
 api-version: 1.13
 authors: [HalfOf2]
+load: POSTWORLD
+worlds:
+  expanse:
+    generator: Expanse
+commands:
+  warp:
+    permission: tgn.expanse.warp
+    aliases: wrp
+    usage: /warp
+    description: warp to the expanse
+    permission-message: no perms
