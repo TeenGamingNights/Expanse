@@ -4,14 +4,14 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
-import org.github.tgn.expanse.world.population.ChestPopulator;
+import org.github.tgn.expanse.world.structures.LootStruct;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class VoidGenerator extends ChunkGenerator {
 	private static final int SIZE = 16;
 	private final Biome[] biomes;
-
 	public VoidGenerator(Biome[] biomes) {
 		this.biomes = biomes;
 	}
@@ -25,8 +25,8 @@ public class VoidGenerator extends ChunkGenerator {
 
 	@Override
 	public List<BlockPopulator> getDefaultPopulators(World world) {
-		List<BlockPopulator> populators = super.getDefaultPopulators(world);
-		populators.add(new ChestPopulator());
+		List<BlockPopulator> populators = new ArrayList<>();
+		populators.add(new LootStruct());
 		return populators;
 	}
 

@@ -15,9 +15,11 @@ import org.github.tgn.expanse.world.VoidGenerator;
 import java.util.Random;
 
 public final class Expanse extends JavaPlugin implements Listener {
+	public static Expanse instance;
 
 	@Override
 	public void onEnable() {
+		instance = this;
 		// Plugin startup logic
 		System.out.println("Expanse init!");
 		WorldCreator creator = new WorldCreator("expanse");
