@@ -22,7 +22,6 @@ public class Ketamine implements CustomItem, CanInteractWith {
 	public void interact(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 1200, 3));
-		player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 1200, 3));
 		player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 1200, 3));
 		player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 1200, 3));
 	}

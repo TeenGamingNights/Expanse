@@ -1,6 +1,5 @@
 package org.github.tgn.expanse;
 
-import net.devtech.utilib.functions.ThrowingSupplier;
 import net.devtech.yajslib.persistent.AnnotatedPersistent;
 import net.devtech.yajslib.persistent.PersistentRegistry;
 import net.devtech.yajslib.persistent.SimplePersistentRegistry;
@@ -23,8 +22,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.github.tgn.expanse.entities.SuperBoss;
 import org.github.tgn.expanse.entities.CustomEntity;
+import org.github.tgn.expanse.entities.SuperBoss;
 import org.github.tgn.expanse.items.*;
 import org.github.tgn.expanse.items.custom.*;
 import org.github.tgn.expanse.util.EmptyPersistent;
@@ -48,6 +47,7 @@ public final class Expanse extends JavaPlugin implements Listener {
 	public static final ArrayList<String> ITEM_IDS = new ArrayList<>();
 
 	private World theExpanse;
+
 	static {
 		PERSISTENT_REGISTRY.register(SuperBoss.class, new AnnotatedPersistent<>(SuperBoss::new, SuperBoss.class, 182919109209L));
 		PERSISTENT_REGISTRY.register(String.class, new StringPersistent(328991291L));
@@ -58,6 +58,7 @@ public final class Expanse extends JavaPlugin implements Listener {
 		PERSISTENT_REGISTRY.register(Dynamite.class, new EmptyPersistent<>(342032L, Dynamite::new));
 		PERSISTENT_REGISTRY.register(Glowstick.class, new EmptyPersistent<>(2901040L, Glowstick::new));
 		PERSISTENT_REGISTRY.register(Ketamine.class, new EmptyPersistent<>(43092091L, Ketamine::new));
+		PERSISTENT_REGISTRY.register(SmeltingTool.class, new AnnotatedPersistent<>(() -> new SmeltingTool(null), SmeltingTool.class, 439209120920L));
 		SUPPLIER_MAP.put("basic", SuperBoss::new);
 		EntityType[] lists = {EntityType.SKELETON, EntityType.ZOMBIE, EntityType.CREEPER, EntityType.WITHER_SKELETON, EntityType.WITCH, EntityType.SPIDER, EntityType.BLAZE, EntityType.GHAST};
 		SPAWN.add(l -> {
@@ -72,23 +73,12 @@ public final class Expanse extends JavaPlugin implements Listener {
 		register("dynamite", Dynamite::new);
 		register("glowstick", Glowstick::new);
 		register("ketamine", Ketamine::new);
-		register("magmaxe", 20912091209L,  Material.GOLDEN_AXE);
-		register("lavapick", 33209092209L, Material.GOLDEN_PICKAXE);
-		register("magmashovel", 48920920L, Material.GOLDEN_SHOVEL);
+
+		register("magmaxe", () -> new SmeltingTool(Material.GOLDEN_AXE));
+		register("lavapick", () -> new SmeltingTool(Material.IRON_PICKAXE));
+		register("magmashovel", () -> new SmeltingTool(Material.GOLDEN_SHOVEL));
 	}
 
-	// lazy
-	private static void register(String name, long id, Material type) {
-		AbstractSmeltingTool tool = new AbstractSmeltingTool() {
-			@Override
-			protected Material getTool() {
-				return type;
-			}
-		};
-		ThrowingSupplier<CustomItem> toolSupplier = () -> (CustomItem) PERSISTENT_REGISTRY.fromByteArray(PERSISTENT_REGISTRY.toByteArray(tool));
-		register(name, toolSupplier);
-		PERSISTENT_REGISTRY.register((Class)tool.getClass(), new EmptyPersistent<>(id, toolSupplier));
-	}
 	private static void register(String key, Supplier<CustomItem> itemSupplier) {
 		ITEM_IDS.add(key);
 		CUSTOM_ITEMS.put(key, () -> CustomItemFactory.wrap(PERSISTENT_REGISTRY, itemSupplier.get()));
@@ -131,7 +121,7 @@ public final class Expanse extends JavaPlugin implements Listener {
 			} else return false;
 		}));
 		this.getCommand("cheat").setExecutor((sender, command, label, args) -> {
-			if(sender instanceof InventoryHolder && args.length == 1) {
+			if (sender instanceof InventoryHolder && args.length == 1) {
 				Inventory inventory = ((InventoryHolder) sender).getInventory();
 				inventory.addItem(CUSTOM_ITEMS.get(args[0]).get());
 				return true;

@@ -1,5 +1,9 @@
 package org.github.tgn.expanse.items.custom;
 
+import net.devtech.yajslib.annotations.Reader;
+import net.devtech.yajslib.annotations.Writer;
+import net.devtech.yajslib.io.PersistentInput;
+import net.devtech.yajslib.io.PersistentOutput;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -12,17 +16,23 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.github.tgn.expanse.items.CanBreakWith;
 import org.github.tgn.expanse.items.CustomItem;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 
-public abstract class AbstractSmeltingTool implements CustomItem, CanBreakWith {
+public class SmeltingTool implements CustomItem, CanBreakWith {
+	private static final Material[] MATERIALS = Material.values();
+	private Material type;
+
+	public SmeltingTool(Material type) {this.type = type;}
+
 	@Override
 	public ItemStack createBaseStack() {
-		Material toolType = this.getTool();
+		Material toolType = this.type;
 		ItemStack pick = new ItemStack(toolType);
 		ItemMeta meta = pick.getItemMeta();
 		String name = toolType.name();
-		meta.setDisplayName(ChatColor.GOLD+"Magma " + name.substring(name.lastIndexOf('_')));
+		meta.setDisplayName(ChatColor.GOLD+"Magma " + name.substring(name.lastIndexOf('_')+1).toLowerCase());
 		meta.setLore(Collections.singletonList(ChatColor.GOLD + "Smelts the items it mines!"));
 		meta.addEnchant(Enchantment.DURABILITY, 5, true);
 		pick.setItemMeta(meta);
@@ -47,9 +57,9 @@ public abstract class AbstractSmeltingTool implements CustomItem, CanBreakWith {
 		while (iterator.hasNext()) {
 			Recipe recipe = iterator.next();
 			if(recipe instanceof CookingRecipe) {
-				ItemStack input = ((CookingRecipe<?>) recipe).getInput();
-				if(input.isSimilar(stack)) {
-					ItemStack in = input.clone();
+				boolean input = ((CookingRecipe<?>) recipe).getInputChoice().test(stack);
+				if(input) {
+					ItemStack in = recipe.getResult().clone();
 					in.setAmount(stack.getAmount());
 					return in;
 				}
@@ -59,5 +69,14 @@ public abstract class AbstractSmeltingTool implements CustomItem, CanBreakWith {
 		return stack;
 	}
 
-	protected abstract Material getTool();
+	@Reader(439209120920L)
+	public void read(PersistentInput input) throws IOException {
+		this.type = MATERIALS[input.readInt()];
+	}
+
+	@Writer(439209120920L)
+	public void write(PersistentOutput output) throws IOException {
+		output.writeInt(this.type.ordinal());
+	}
+
 }
