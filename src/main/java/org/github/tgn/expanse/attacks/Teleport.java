@@ -17,11 +17,10 @@ public class Teleport implements Attack<Entity> {
 		Location current = entity.getLocation();
 		current.add(RANDOM.nextInt() % this.bounds, RANDOM.nextInt() % this.bounds, RANDOM.nextInt() % this.bounds);
 		entity.teleport(current);
-		makePlatform(current.subtract(0, 1, 0).clone());
+		makePlatform(current.subtract(0, 1, 0).clone(), 2);
 	}
 
-	private static void makePlatform(Location location) {
-		int platformSize = 2;
+	public static void makePlatform(Location location, int platformSize) {
 		for (int x = -platformSize; x < platformSize+1; x++) {
 			for (int z = -platformSize; z < platformSize+1; z++) {
 				Location platformLocation = location.clone();

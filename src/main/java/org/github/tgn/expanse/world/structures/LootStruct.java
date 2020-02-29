@@ -1,25 +1,26 @@
 package org.github.tgn.expanse.world.structures;
 
 import org.bukkit.Chunk;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
+import org.bukkit.entity.Entity;
 import org.bukkit.generator.BlockPopulator;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.github.tgn.expanse.Expanse;
+import org.github.tgn.expanse.attacks.Teleport;
+import org.github.tgn.expanse.entities.CustomEntity;
 import java.util.Random;
 
+import static org.github.tgn.expanse.Expanse.ENTITY_MANAGER;
+
 public class LootStruct extends BlockPopulator {
+	public static final Random RANDOM = new Random();
 	@Override
 	public void populate(World world, Random random, Chunk source) {
-		if(random.nextInt(25) == 0) {
-			Block block = source.getBlock(random.nextInt(16), random.nextInt(256), random.nextInt(16));
-			block.setType(Material.CHEST, false);
-			PersistentDataContainer container = ((Chest) block.getState()).getPersistentDataContainer();
-			container.set(new NamespacedKey(Expanse.instance, "chestKey"), PersistentDataType.LONG, random.nextLong());
+		if(random.nextInt(50) == 0) {
+			Location location = new Location(world, source.getX()*16, random.nextInt(64)+64, source.getZ()*16);
+			Teleport.makePlatform(location.clone().subtract(0, 1, 0), 5);
+			Expanse.Pair<CustomEntity, Entity> entityPair = Expanse.SPAWN.get(RANDOM.nextInt(Expanse.SPAWN.size())).apply(location);
+			ENTITY_MANAGER.attach(entityPair.b, entityPair.a);
 		}
 	}
 }

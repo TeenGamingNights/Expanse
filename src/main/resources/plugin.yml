@@ -14,7 +14,13 @@ commands:
     usage: /warp
     description: warp to the expanse
   create:
-    permission-message: tgn.expanse.create
+    permission: tgn.expanse.create
     description: summon a new boss mob
     usage: /create <id> <mob>
-    aliases: c
+    aliases: cr
+  cheat:
+    permission: tgn.expanse.cheat
+    description: give a custom item
+    usage: /cheat <id>
+    aliases: ct
+

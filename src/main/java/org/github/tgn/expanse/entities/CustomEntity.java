@@ -3,6 +3,7 @@ package org.github.tgn.expanse.entities;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import java.util.Random;
 
 public interface CustomEntity<E extends Entity> {
@@ -10,4 +11,5 @@ public interface CustomEntity<E extends Entity> {
 	default void attach(E entity) {}
 	default void attack(Player player, E current) {}
 	default void damage(EntityDamageEvent event) {}
+	default void die(EntityDeathEvent event) {}
 }

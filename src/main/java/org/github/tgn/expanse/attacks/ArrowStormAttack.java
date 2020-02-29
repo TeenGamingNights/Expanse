@@ -15,7 +15,7 @@ public class ArrowStormAttack<E extends ProjectileSource & Entity> implements At
 	@Override
 	public void attack(CustomEntity<E> instance, Player player, E entity) {
 		for (int i = 0; i < this.times; i++) {
-			Vector vector = entity.getLocation(player.getLocation()).toVector(); // get entity -> player vector
+			Vector vector = player.getLocation(entity.getLocation()).toVector(); // get entity -> player vector
 			vector.rotateAroundX(RANDOM.nextDouble() / 2);
 			vector.rotateAroundY(RANDOM.nextDouble() / 2);
 			vector.rotateAroundZ(RANDOM.nextDouble() / 2);

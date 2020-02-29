@@ -18,6 +18,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.github.tgn.expanse.entities.CustomEntity;
 import java.io.IOException;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
@@ -60,11 +61,11 @@ public class EntityManager implements Listener {
 		}
 	}
 
-	public <E extends Event> void registerEntityEvent(Plugin plugin, Class<E> eventClass, Function<E, Entity> eventFunction, TriConsumer<CustomEntity, E, Entity> executor) {
+	public <E extends Event> void registerEntityEvent(Plugin plugin, Class<E> eventClass, Function<E, Entity> eventFunction, BiConsumer<CustomEntity, E> executor) {
 		Bukkit.getPluginManager().registerEvent(eventClass, this, EventPriority.NORMAL, (listener, event) -> {
 			Entity entity = eventFunction.apply((E) event);
 			CustomEntity custom = this.parse(entity);
-			if (custom != null) executor.accept(custom, (E) event, entity);
+			if (custom != null) executor.accept(custom, (E) event);
 		}, plugin);
 	}
 

@@ -1,8 +1,6 @@
 package org.github.tgn.expanse.attacks;
 
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,7 +22,6 @@ public interface ParticleAttack<E extends Entity> extends Attack<E> {
 			Vector current = new Vector(0, 0, 0).copy(normalizedVector);
 			current.multiply(i);
 			Location particle = entity.getLocation().add(current);
-			particle.add(player.getLocation());
 			world.spawnParticle(this.getParticleType(), particle, 1, this.dataType());
 		}
 		this.inflict(entity, player);
@@ -59,6 +56,11 @@ public interface ParticleAttack<E extends Entity> extends Attack<E> {
 		@Override
 		public void inflict(Entity current, Player player) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 40, 1));
+		}
+
+		@Override
+		public Object dataType() {
+			return Bukkit.createBlockData(Material.STONE);
 		}
 	}
 
