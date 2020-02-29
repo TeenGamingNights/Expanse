@@ -4,6 +4,7 @@ import net.devtech.utilib.functions.TriConsumer;
 import net.devtech.yajslib.persistent.Persistent;
 import net.devtech.yajslib.persistent.PersistentRegistry;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -22,28 +23,25 @@ import java.util.logging.Logger;
 
 public class EntityManager implements Listener {
 	private static final Logger LOGGER = Logger.getLogger(EntityManager.class.getSimpleName());
-	private final World world;
-	private final Plugin plugin;
 	private final NamespacedKey pid;
 	private final NamespacedKey psd;
 	private final PersistentRegistry registry;
 
-	public EntityManager(Plugin plugin, World world, PersistentRegistry registry) {
-		this.world = world;
-		this.plugin = plugin;
+	public EntityManager(PersistentRegistry registry) {
 		this.registry = registry;
-		this.pid = new NamespacedKey(plugin, "expanse.persistentID");
-		this.psd = new NamespacedKey(plugin, "expanse.persistentSerializedData");
+		this.pid = new NamespacedKey("expanse","persistent.id");
+		this.psd = new NamespacedKey("expanse", "persistent.serialized.data");
 	}
 
-	public void tick() {
-		for (Player player : this.world.getPlayers()) {
+	public void tick(World world) {
+		for (Player player : world.getPlayers()) {
+			if(player.getGameMode() == GameMode.CREATIVE)
+				continue;
 			BoundingBox box = player.getBoundingBox();
 			box.expand(32);
-			for (Entity entity : this.world.getNearbyEntities(box)) {
+			for (Entity entity : world.getNearbyEntities(box)) {
 				CustomEntity customEntity = this.parse(entity);
-				if(customEntity != null)
-					customEntity.attack(player, entity);
+				if (customEntity != null) customEntity.attack(player, entity);
 			}
 		}
 	}
@@ -62,13 +60,12 @@ public class EntityManager implements Listener {
 		}
 	}
 
-	public <E extends Event> void registerEntityEvent(Class<E> eventClass, Function<E, Entity> eventFunction, TriConsumer<CustomEntity, E, Entity> executor) {
+	public <E extends Event> void registerEntityEvent(Plugin plugin, Class<E> eventClass, Function<E, Entity> eventFunction, TriConsumer<CustomEntity, E, Entity> executor) {
 		Bukkit.getPluginManager().registerEvent(eventClass, this, EventPriority.NORMAL, (listener, event) -> {
 			Entity entity = eventFunction.apply((E) event);
 			CustomEntity custom = this.parse(entity);
-			if(custom != null)
-				executor.accept(custom, (E) event, entity);
-		}, this.plugin);
+			if (custom != null) executor.accept(custom, (E) event, entity);
+		}, plugin);
 	}
 
 	public CustomEntity parse(Entity entity) {

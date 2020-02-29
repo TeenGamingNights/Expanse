@@ -13,4 +13,8 @@ commands:
     aliases: wrp
     usage: /warp
     description: warp to the expanse
-    permission-message: no perms
+  create:
+    permission-message: tgn.expanse.create
+    description: summon a new boss mob
+    usage: /create <id> <mob>
+    aliases: c

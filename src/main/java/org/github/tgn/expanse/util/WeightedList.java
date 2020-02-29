@@ -13,9 +13,13 @@ public class WeightedList<T> {
 	}
 
 	public T get(int index) {
+		System.out.println(index);
+		int counter = 0;
 		for (int weight : this.weights) {
+			System.out.println(index);
 			if(index-weight < 0)
-				return this.values.get(index);
+				return this.values.get(counter);
+			counter++;
 			index-=weight;
 		}
 		throw new ArrayIndexOutOfBoundsException("ono");

@@ -4,15 +4,16 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.github.tgn.expanse.entities.CustomEntity;
 
-public interface ParticleAttack extends Attack<CustomEntity> {
+public interface ParticleAttack<E extends Entity> extends Attack<E> {
 	@Override
-	default void attack(CustomEntity instance, Player player, Entity entity) {
+	default void attack(CustomEntity<E> instance, Player player, E entity) {
 		World world = entity.getWorld();
 		Location relative = entity.getLocation(); // current location
 		relative.subtract(player.getLocation()); // vectorify
@@ -26,16 +27,16 @@ public interface ParticleAttack extends Attack<CustomEntity> {
 			particle.add(player.getLocation());
 			world.spawnParticle(this.getParticleType(), particle, 1, this.dataType());
 		}
-		this.inflict(player);
+		this.inflict(entity, player);
 	}
 
 	Particle getParticleType();
 
-	void inflict(Player player);
+	void inflict(E current, Player player);
 
 	default Object dataType() {return null;}
 
-	class Ignite implements ParticleAttack {
+	class Ignite implements ParticleAttack<Entity> {
 
 		@Override
 		public Particle getParticleType() {
@@ -43,12 +44,12 @@ public interface ParticleAttack extends Attack<CustomEntity> {
 		}
 
 		@Override
-		public void inflict(Player player) {
+		public void inflict(Entity current, Player player) {
 			player.setFireTicks(60);
 		}
 	}
 
-	class Wither implements ParticleAttack {
+	class Wither implements ParticleAttack<Entity> {
 
 		@Override
 		public Particle getParticleType() {
@@ -56,20 +57,34 @@ public interface ParticleAttack extends Attack<CustomEntity> {
 		}
 
 		@Override
-		public void inflict(Player player) {
+		public void inflict(Entity current, Player player) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 40, 1));
 		}
 	}
 
-	class Poison implements ParticleAttack {
+	class Poison implements ParticleAttack<Entity> {
 		@Override
 		public Particle getParticleType() {
 			return Particle.PORTAL;
 		}
 
 		@Override
-		public void inflict(Player player) {
+		public void inflict(Entity current, Player player) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 40, 1));
+		}
+	}
+
+	class LifeDrain implements ParticleAttack<LivingEntity> {
+
+		@Override
+		public Particle getParticleType() {
+			return Particle.HEART;
+		}
+
+		@Override
+		public void inflict(LivingEntity current, Player player) {
+			player.damage(4);
+			current.setHealth(Math.min(current.getMaxHealth(), current.getHealth()+4));
 		}
 	}
 }
